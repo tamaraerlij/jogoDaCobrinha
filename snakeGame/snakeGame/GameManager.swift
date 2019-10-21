@@ -5,178 +5,213 @@
 //  Created by Tamara Erlij on 20/10/19.
 //  Copyright © 2019 Tamara Erlij. All rights reserved.
 //
-import Foundation
+
 import SpriteKit
 
-enum PlayerDirection {
-    case LEFT
-    case RIGHT
-    case UP
-    case DOWN
-    case DIED
-}
-
 class GameManager {
+    var scene: GameScene!
+    var nextTime: Double?
+    var timeExtension: Double = 0.15
+    var playerDirection: Int = 4
+    var currentScore: Int = 0
+    let defaults = UserDefaults.standard
     
-    private var scene: GameScene!
-    var numRows: Int!
-    var numCols: Int!
-    
-    private var nextTime: Double?
-    private var timeExtension: Double = 0.12
-    private var playerDirection: PlayerDirection = .LEFT
-    private var playerPositions: [Point] = []
-    
-    private var scorePos: Point?
-    private var currentScore: Int = 0
-    
-    init(scene: GameScene, numRows: Int, numCols: Int) {
+    init(scene: GameScene) {
         self.scene = scene
-        self.numRows = numRows
-        self.numCols = numCols
     }
     
     func initGame() {
-        //starting player position
-        playerPositions.append(Point(10, 10))
-        playerPositions.append(Point(10, 11))
-        playerPositions.append(Point(10, 12))
-        playerDirection = .LEFT
+        scene.playerPositions.append((10, 10))
+        scene.playerPositions.append((10, 11))
+        scene.playerPositions.append((10, 12))
+        
         renderChange()
-        generateNewScorePos()
+        
+        generateNewPoint()
     }
-
+    
+    private func generateNewPoint() {
+        var randX = CGFloat(Int.random(in: 0...19))
+        var randY = CGFloat(Int.random(in: 0...39))
+        
+        while contains(a: scene.playerPositions, v: (Int(randX), Int(randY))) {
+            randX = CGFloat(Int.random(in: 0...19))
+            randY = CGFloat(Int.random(in: 0...39))
+        }
+        
+        scene.scorePos = CGPoint(x: randX, y: randY)
+    }
+    
+    private func checkForScore() {
+        if scene.scorePos != nil {
+            let x = scene.playerPositions[0].0
+            let y = scene.playerPositions[0].1
+            
+            if Int((scene.scorePos?.x)!) == y && Int((scene.scorePos?.y)!) == x {
+                currentScore += 1
+                scene.currentScore.text = "Score: \(currentScore)"
+                generateNewPoint()
+                
+                scene.playerPositions.append(scene.playerPositions.last!)
+                scene.playerPositions.append(scene.playerPositions.last!)
+            }
+        }
+    }
+    
+    private func checkForDeath() {
+        if scene.playerPositions.count > 0 {
+            var arrayOfPositions = scene.playerPositions
+            let headOfSnake = arrayOfPositions[0]
+            
+            arrayOfPositions.remove(at: 0)
+            
+            if contains(a: arrayOfPositions, v: headOfSnake) {
+                playerDirection = 0
+            }
+        }
+    }
+    
+    private func finishAnimation() {
+        if playerDirection == 0 && scene.playerPositions.count > 0 {
+            var hasFinished = true
+            let headOfSnake = scene.playerPositions[0]
+            
+            for position in scene.playerPositions {
+                if headOfSnake != position {
+                    hasFinished = false
+                }
+            }
+            
+            if hasFinished {
+                updateScore()
+                playerDirection = 4
+                scene.scorePos = nil
+                scene.playerPositions.removeAll()
+                renderChange()
+                scene.currentScore.run(SKAction.scale(to: 0, duration: 0.4)) {
+                    self.scene.currentScore.isHidden = true
+                }
+                
+                scene.gameBackground.run(SKAction.scale(to: 0, duration: 0.4)) {
+                    self.scene.gameBackground.isHidden = true
+                    self.scene.logo.isHidden = false
+                    self.scene.logo.run(SKAction.move(to: CGPoint(x: 0, y: (self.scene.frame.size.height / 2) - 200), duration: 0.5)) {
+                        self.scene.playButton.isHidden = false
+                        self.scene.playButton.run(SKAction.scale(to: 1, duration: 0.3))
+                        self.scene.highScore.run(SKAction.move(to: CGPoint(x: 0, y: self.scene.logo.position.y - 50), duration: 0.3))
+                    }
+                }
+            }
+        }
+    }
+    
     func update(time: Double) {
         if nextTime == nil {
             nextTime = time + timeExtension
-        } else if time >= nextTime! {
-            nextTime = time + timeExtension
-            if playerPositions.count > 0 {
+        } else {
+            if time >= nextTime! {
+                nextTime = time + timeExtension
                 updatePlayerPosition()
                 checkForScore()
-                checkPlayerDied()
-            } else if playerPositions.count == 0 && playerDirection == .DIED { // If no more snake and died
-                playerPositions.removeAll()
-                playerDirection = .LEFT // Change direction
-                renderChange()
-                scene.finishAnimation()
+                checkForDeath()
+                finishAnimation()
             }
         }
-    }
-    
-    func changeDirection(_ direction: PlayerDirection) {
-        if playerDirection == .DIED { return }
-        
-        if playerDirection == .LEFT && direction != .RIGHT { playerDirection = direction }
-        else if playerDirection == .RIGHT && direction != .LEFT { playerDirection = direction }
-        else if playerDirection == .UP && direction != .DOWN { playerDirection = direction }
-        else if playerDirection == .DOWN && direction != .UP { playerDirection = direction }
     }
     
     private func updatePlayerPosition() {
-        // Init changes like if user died
-        var xChange = 0
+        var xChange = -1
         var yChange = 0
-        if playerDirection == .LEFT {
+        
+        switch playerDirection {
+        case 1:// left
             xChange = -1
-        } else if playerDirection == .RIGHT {
-            xChange = 1
-        } else if playerDirection == .UP {
+            yChange = 0
+        case 2:// up
+            xChange = 0
             yChange = -1
-        } else if playerDirection == .DOWN {
+        case 3:// right
+            xChange = 1
+            yChange = 0
+        case 4:// down
+            xChange = 0
             yChange = 1
+        case 0:// death
+            xChange = 0
+            yChange = 0
+        default:
+            break
         }
-
-        if playerPositions.count > 0 {
-            if playerDirection == .DIED {
-                playerPositions.removeLast()
-            } else {
-                var start = playerPositions.count - 1
-                while start > 0 {
-                    playerPositions[start] = playerPositions[start - 1]
-                    start -= 1
-                }
-                playerPositions[0] = Point(
-                    playerPositions[0].x + xChange,
-                    playerPositions[0].y + yChange
-                )
+        
+        if scene.playerPositions.count > 0 {
+            var start = scene.playerPositions.count - 1
+            
+            while start > 0 {
+                scene.playerPositions[start] = scene.playerPositions[start - 1]
+                start -= 1
             }
+            
+            scene.playerPositions[0] = (scene.playerPositions[0].0 + yChange, scene.playerPositions[0].1 + xChange)
         }
-        // Avoid snake go outside screen
-        if playerPositions.count > 0 {
-            let x = playerPositions[0].x
-            let y = playerPositions[0].y
-            if y >= numRows {
-                playerPositions[0].y = 0
+        
+        if scene.playerPositions.count > 0 {
+            let x = scene.playerPositions[0].1
+            let y = scene.playerPositions[0].0
+            
+            if y > 40 {
+                scene.playerPositions[0].0 = 0
             } else if y < 0 {
-                playerPositions[0].y = numRows - 1
-            }
-            if x >= numCols {
-                playerPositions[0].x = 0
+                scene.playerPositions[0].0 = 40
+            } else if x > 20 {
+                scene.playerPositions[0].1 = 0
             } else if x < 0 {
-                playerPositions[0].x = numCols - 1
+                scene.playerPositions[0].1 = 20
             }
         }
+        
         renderChange()
     }
     
-    func checkForScore() {
-        if scorePos != nil && playerPositions.count > 0 {
-            let playerPos: Point = playerPositions[0]
-            if playerPos.equals(scorePos!) { // Player hit scorePos
-                currentScore += 1
-                scene.currentScore.text = "Score: \(currentScore)"
-                generateNewScorePos()
-                playerPositions.append(playerPositions.last!)
-                playerPositions.append(playerPositions.last!)
-                playerPositions.append(playerPositions.last!)
-            }
+    private func updateScore() {
+        if currentScore > defaults.integer(forKey: "highScore") {
+            defaults.set(currentScore, forKey: "highScore")
         }
+        
+        currentScore = 0
+        scene.currentScore.text = "Score: 0"
+        scene.highScore.text = "High Score: \(defaults.integer(forKey: "highScore"))"
     }
     
-    func generateNewScorePos() {
-        var p: Point? = nil
-        // While score point is at same of player position, generate new one
-        while p == nil || contains(allPoint: playerPositions, point: p!) {
-            p = Point(Int.random(in: 0 ..< numCols), Int.random(in: 0 ..< numRows))
-        }
-        scorePos = p!
-    }
-    
-    func checkPlayerDied() {
-        if playerPositions.count > 0 {
-            var positions = playerPositions.filter { _ in return true }
-            let headSnake = positions[0]
-            positions.remove(at: 0)
-            if contains(allPoint: positions, point: headSnake) {
-                changeDirection(.DIED)
-                return
-            }
-        }
-    }
-
     func renderChange() {
-        for (node, point) in scene.gameArray {
-            let isScorePos = scorePos != nil && point.equals(scorePos!)
-            let isPlayerPos = contains(allPoint: playerPositions, point: point)
-            
-            if isPlayerPos && playerDirection != .DIED {
-                node.fillColor = SKColor.green
-            } else if isScorePos {
-                node.fillColor = SKColor.red
-            } else if isPlayerPos && playerDirection == .DIED {
-                node.fillColor = SKColor.orange
+        for (node, x, y) in scene.gameArray {
+            if contains(a: scene.playerPositions, v: (x, y)) {
+                node.fillColor = SKColor.init(red: 0.012, green: 0.61, blue: 0.36, alpha: 1)
             } else {
                 node.fillColor = SKColor.clear
+                
+                if scene.scorePos != nil {
+                    if Int((scene.scorePos?.x)!) == y && Int((scene.scorePos?.y)!) == x {
+                        node.fillColor = SKColor.blue
+                    }
+                }
             }
         }
     }
-
-    func contains(allPoint: [Point], point: Point) -> Bool {
-        for p in allPoint {
-            if point.x == p.x && point.y == p.y { return true }
-        }
+    
+    func contains(a:[(Int, Int)], v:(Int,Int)) -> Bool {
+        let (c1, c2) = v
+        
+        for (v1, v2) in a { if v1 == c1 && v2 == c2 { return true } }
         return false
     }
+    
+    func swipe(ID: Int) {
+        if !(ID == 2 && playerDirection == 4) && !(ID == 4 && playerDirection == 2) {
+            if !(ID == 1 && playerDirection == 3) && !(ID == 3 && playerDirection == 1) {
+                if playerDirection != 0 {
+                    playerDirection = ID
+                }
+            }
+        }
+    }
 }
-
