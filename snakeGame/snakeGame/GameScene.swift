@@ -11,6 +11,7 @@ import GameplayKit
 
 class GameScene: SKScene {
     
+    // Variáveis do jogo
     var logo: SKLabelNode!
     var highScore: SKLabelNode!
     var playButton: SKShapeNode!
@@ -21,13 +22,14 @@ class GameScene: SKScene {
     var gameArray: [(node: SKShapeNode, x: Int, y: Int)] = []
     var scorePos: CGPoint?
     
+    
     override func didMove(to view: SKView) {
         initializeMenu()
-        
         game = GameManager(scene: self)
-        
         initializeGameView()
         
+        
+        // Direções de swipe, isto é, as direções em que a cobrinha pode ir apenas com o toque
         let swipeRight:UISwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(swipeR))
         swipeRight.direction = .right
         
@@ -40,6 +42,7 @@ class GameScene: SKScene {
         let swipeDown:UISwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(swipeD))
         swipeDown.direction = .down
 
+        // Implementação desse swipe
         view.addGestureRecognizer(swipeRight)
         view.addGestureRecognizer(swipeLeft)
         view.addGestureRecognizer(swipeUp)
@@ -158,6 +161,7 @@ class GameScene: SKScene {
         createGameBoard(width: width, height: height)
     }
     
+    // Criação do campo
     private func createGameBoard(width: Int, height: Int) {
         let numCols = 20
         let numRows = numCols * 2

@@ -15,6 +15,7 @@ class GameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Criação da cena
         if let view = self.view as! SKView? {
             // Load the SKScene from 'GameScene.sks'
             if let scene = SKScene(fileNamed: "GameScene") {
@@ -26,16 +27,16 @@ class GameViewController: UIViewController {
             }
             
             view.ignoresSiblingOrder = true
-            
             view.showsFPS = false
             view.showsNodeCount = false
         }
     }
-
+    // Jogo pode rotacionar
     override var shouldAutorotate: Bool {
         return true
     }
-
+    
+    // Orientação da tela
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         if UIDevice.current.userInterfaceIdiom == .phone {
             return .allButUpsideDown
@@ -43,7 +44,7 @@ class GameViewController: UIViewController {
             return .all
         }
     }
-
+    // Não apresentar StatusBar
     override var prefersStatusBarHidden: Bool {
         return true
     }
