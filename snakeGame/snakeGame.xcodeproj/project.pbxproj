@@ -15,6 +15,7 @@
 		95B0D5ED235D328700967621 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95B0D5EB235D328700967621 /* Main.storyboard */; };
 		95B0D5EF235D328900967621 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 95B0D5EE235D328900967621 /* Assets.xcassets */; };
 		95B0D5F2235D328900967621 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95B0D5F0235D328900967621 /* LaunchScreen.storyboard */; };
+		95B0D5FA235D32F500967621 /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B0D5F9235D32F500967621 /* GameManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		95B0D5EE235D328900967621 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		95B0D5F1235D328900967621 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		95B0D5F3235D328900967621 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		95B0D5F9235D32F500967621 /* GameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +67,7 @@
 				95B0D5E5235D328700967621 /* Actions.sks */,
 				95B0D5E7235D328700967621 /* GameScene.swift */,
 				95B0D5E9235D328700967621 /* GameViewController.swift */,
+				95B0D5F9235D32F500967621 /* GameManager.swift */,
 				95B0D5EB235D328700967621 /* Main.storyboard */,
 				95B0D5EE235D328900967621 /* Assets.xcassets */,
 				95B0D5F0235D328900967621 /* LaunchScreen.storyboard */,
@@ -147,6 +150,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				95B0D5E8235D328700967621 /* GameScene.swift in Sources */,
+				95B0D5FA235D32F500967621 /* GameManager.swift in Sources */,
 				95B0D5EA235D328700967621 /* GameViewController.swift in Sources */,
 				95B0D5E2235D328700967621 /* AppDelegate.swift in Sources */,
 			);
