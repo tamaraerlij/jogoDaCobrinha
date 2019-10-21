@@ -54,6 +54,7 @@ class GameManager {
                 
                 scene.playerPositions.append(scene.playerPositions.last!)
                 scene.playerPositions.append(scene.playerPositions.last!)
+                
             }
         }
     }
@@ -89,13 +90,15 @@ class GameManager {
                 scene.playerPositions.removeAll()
                 renderChange()
                 scene.currentScore.run(SKAction.scale(to: 0, duration: 0.4)) {
-                    self.scene.currentScore.isHidden = true
+                 self.scene.currentScore.isHidden = true
                 }
                 
                 scene.gameBackground.run(SKAction.scale(to: 0, duration: 0.4)) {
                     self.scene.gameBackground.isHidden = true
                     self.scene.logo.isHidden = false
                     self.scene.logo.run(SKAction.move(to: CGPoint(x: 0, y: (self.scene.frame.size.height / 2) - 200), duration: 0.5)) {
+                        
+                        
                         self.scene.playButton.isHidden = false
                         self.scene.playButton.run(SKAction.scale(to: 1, duration: 0.3))
                         self.scene.highScore.run(SKAction.move(to: CGPoint(x: 0, y: self.scene.logo.position.y - 50), duration: 0.3))
@@ -180,6 +183,7 @@ class GameManager {
         currentScore = 0
         scene.currentScore.text = "Score: 0"
         scene.highScore.text = "High Score: \(defaults.integer(forKey: "highScore"))"
+     //   scene.currentScore.isHidden = true
     }
     
     func renderChange() {
@@ -189,9 +193,10 @@ class GameManager {
             } else {
                 node.fillColor = SKColor.clear
                 
+                // Apple
                 if scene.scorePos != nil {
                     if Int((scene.scorePos?.x)!) == y && Int((scene.scorePos?.y)!) == x {
-                        node.fillColor = SKColor.blue
+                        node.fillColor = SKColor.red
                     }
                 }
             }

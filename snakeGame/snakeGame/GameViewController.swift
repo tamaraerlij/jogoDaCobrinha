@@ -31,12 +31,12 @@ class GameViewController: UIViewController {
             view.showsNodeCount = false
         }
     }
-    // Jogo pode rotacionar
+    // Game can rotate
     override var shouldAutorotate: Bool {
         return true
     }
     
-    // Orientação da tela
+    // Screen Orientation
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         if UIDevice.current.userInterfaceIdiom == .phone {
             return .allButUpsideDown
@@ -44,7 +44,7 @@ class GameViewController: UIViewController {
             return .all
         }
     }
-    // Não apresentar StatusBar
+    // Do not display StatusBar
     override var prefersStatusBarHidden: Bool {
         return true
     }
